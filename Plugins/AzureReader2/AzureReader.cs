@@ -18,6 +18,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
         string blobStorageEndpoint;
         string vPath;
         bool lazyExistenceCheck = false;
+        bool disableRedirect = false;
 
         public AzureReader2Plugin(NameValueCollection args) {
             blobStorageConnection = args["connectionstring"];
@@ -26,6 +27,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             vPath = args["prefix"];
             lazyExistenceCheck = Utils.getBool(args, "lazyExistenceCheck", lazyExistenceCheck);
             _registerAsVirtualPathProvider = Utils.getBool(args, "vpp", _registerAsVirtualPathProvider);
+            disableRedirect = Utils.getBool(args, "disableRedirect", disableRedirect);
         }
 
 
@@ -78,7 +80,10 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
 
             // Register rewrite
-            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            if (disableRedirect == false)
+            {
+                c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            }
 
             c.Plugins.add_plugin(this);
 
